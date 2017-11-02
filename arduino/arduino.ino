@@ -1,14 +1,6 @@
 
-void breakline()
-{
- static int counts = 0;
- counts++;
- 
- if (counts%20 == 0)
- {
-   Serial.print("\n");
- }
-}
+static int counts = 0;
+static int sn = 0;
 
 class TempPin {
   private:
@@ -17,7 +9,7 @@ class TempPin {
     uint8_t pin;
   public:
      TempPin(uint8_t _pin);
-     void loop();
+     int loop();
 };
 
 TempPin::TempPin(uint8_t _pin) {
@@ -26,7 +18,11 @@ TempPin::TempPin(uint8_t _pin) {
   analogFilter=0;
 }
 
-void TempPin::loop() {
+float toC(int v) {
+  return (v / 1024.0 * 500.0) - 273.15;
+}
+
+int TempPin::loop() {
  int analogValue;
 
  float temperatureC;
@@ -48,18 +44,20 @@ void TempPin::loop() {
  temperatureF = temperatureC * 9.0 / 5.0 + 32.0;
  
  counter++;
- 
- if (counter%20 == 0)
- {
-   Serial.print("Temp @");
-   Serial.print(pin);
-   Serial.print("="); 
-   Serial.print(temperatureF);
-   Serial.print(","); 
-   Serial.print(analogValue);
-   
-   Serial.print("\n");
+ if (false) {
+  if (counter%200 == 0)
+  {
+     
+     Serial.print("Temp @");
+     Serial.print(pin);
+     Serial.print("="); 
+     Serial.print(temperatureF);
+     Serial.print(","); 
+     Serial.print(analogValue);
+     Serial.print("\n");
+   }
  }
+ return analogValue;
 }
 
 TempPin p0(A0);
@@ -77,11 +75,47 @@ void setup()
   
 void loop()
 {
- breakline();
- p0.loop();
- p1.loop();
- p2.loop();
- p3.loop();
- p4.loop();
- p5.loop();
+ int a0 = p0.loop();
+ int a1 = p1.loop();
+ int a2 = p2.loop();
+ int a3 = p3.loop();
+ int a4 = p4.loop();
+ int a5 = p5.loop();
+
+ if (counts%200 == 0)
+ {
+   Serial.print(sn);
+   Serial.print(" ");
+   Serial.print(millis()/1000);
+   Serial.print(" ");
+   Serial.print(a0);
+   Serial.print(" ");
+   Serial.print(a1);
+   Serial.print(" ");
+   Serial.print(a2);
+   Serial.print(" ");
+   Serial.print(a3);
+   Serial.print(" ");
+   Serial.print(a4);
+   Serial.print(" ");
+   Serial.print(a5);
+   Serial.print(" ");
+   Serial.print(toC(a0));
+   Serial.print(" ");
+   Serial.print(toC(a1));
+   Serial.print(" ");
+   Serial.print(toC(a2));
+   Serial.print(" ");
+   Serial.print(toC(a3));
+   Serial.print(" ");
+   Serial.print(toC(a4));
+   Serial.print(" ");
+   Serial.print(toC(a5));
+   Serial.print("\n");
+   sn++;
+
+ }
+ 
+  counts++;
 }
+
